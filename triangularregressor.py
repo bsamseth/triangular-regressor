@@ -4,6 +4,7 @@ from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 
+
 class Triangle(object):
     def __init__(self, vertices):
         """
@@ -62,6 +63,7 @@ class Triangulation(object):
 
     This only acts as a thin convenience wrapper for scipy.spatial.Delaunay.
     """
+
     def __init__(self, points):
         """
         Create a triangulation from the given array of points.
@@ -106,6 +108,7 @@ class TriangularRegressor(BaseEstimator, RegressorMixin):
     linear plane is fitted. The vertices define the domain of the regressors,
     any predictions on points outside the triangulation will be zero.
     """
+
     def __init__(self, vertices=((0, 0), (1, 0), (0, 1), (1, 1), (.5, .5))):
         """
         Arguments
@@ -118,7 +121,7 @@ class TriangularRegressor(BaseEstimator, RegressorMixin):
         try:
             self.vertices = np.asarray(vertices).reshape(-1, 2)
         except:
-            raise ValueError('Vertices must be interpretable as a (m x 2) array.')
+            raise ValueError("Vertices must be interpretable as a (m x 2) array.")
 
         self.triangulation_ = Triangulation(self.vertices)
 
@@ -159,8 +162,10 @@ class TriangularRegressor(BaseEstimator, RegressorMixin):
         return B
 
     def _plot_triangles(self):
-        plt.triplot(self.vertices[:, 0], self.vertices[:, 1], self.triangulation_.simplices)
-        plt.plot(self.vertices[:,0], self.vertices[:,1], 'o')
+        plt.triplot(
+            self.vertices[:, 0], self.vertices[:, 1], self.triangulation_.simplices
+        )
+        plt.plot(self.vertices[:, 0], self.vertices[:, 1], "o")
 
     def predict(self, X):
         """
@@ -180,7 +185,9 @@ class TriangularRegressor(BaseEstimator, RegressorMixin):
         except AttributeError:
             raise RuntimeError("You must fit classifier before predicting data!")
         except ValueError:
-            raise ValueError('X array must be of shape (m x 2), or be reshape-able to this')
+            raise ValueError(
+                "X array must be of shape (m x 2), or be reshape-able to this"
+            )
 
         return self.model_.predict(self._compute_B(X))
 
@@ -192,13 +199,15 @@ class TriangularRegressor(BaseEstimator, RegressorMixin):
         """
         return r2_score(y, self.predict(X))
 
+
 def _franke(x, y):
     """Test function to test interpolation capabilities."""
-    term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
-    term2 = 0.75*np.exp(-((9*x+1)**2)/49.0 - 0.1*(9*y+1))
-    term3 = 0.5*np.exp(-(9*x-7)**2/4.0 - 0.25*((9*y-3)**2))
-    term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
+    term1 = 0.75 * np.exp(-(0.25 * (9 * x - 2) ** 2) - 0.25 * ((9 * y - 2) ** 2))
+    term2 = 0.75 * np.exp(-((9 * x + 1) ** 2) / 49.0 - 0.1 * (9 * y + 1))
+    term3 = 0.5 * np.exp(-(9 * x - 7) ** 2 / 4.0 - 0.25 * ((9 * y - 3) ** 2))
+    term4 = -0.2 * np.exp(-(9 * x - 4) ** 2 - (9 * y - 7) ** 2)
     return term1 + term2 + term3 + term4
+
 
 def _make_test_data(x, y=None):
     if y is None:
@@ -207,6 +216,7 @@ def _make_test_data(x, y=None):
     zz = _franke(xx, yy)
     X = np.c_[xx.reshape(-1, 1), yy.reshape(-1, 1)]
     return X, zz.reshape(-1, 1), xx, yy, zz
+
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
@@ -225,15 +235,22 @@ if __name__ == "__main__":
     model = TriangularRegressor(vertices=vertices)
     model.fit(X_train, z_train)
     model._plot_triangles()
-    print('Training score:', model.score(X_train, z_train))
-    print('Testing score:', model.score(X_test, z_test))
+    print("Training score:", model.score(X_train, z_train))
+    print("Testing score:", model.score(X_test, z_test))
 
     # 3D Visualization
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    ax = fig.gca(projection="3d")
 
     _, _, x_plot, y_plot, z_plot = _make_test_data(np.arange(0, 1, 0.05))
-    ax.plot_surface(x_plot, y_plot, z_plot, alpha=0.5, cmap=cm.coolwarm,
-                           linewidth=0, antialiased=False)
+    ax.plot_surface(
+        x_plot,
+        y_plot,
+        z_plot,
+        alpha=0.5,
+        cmap=cm.coolwarm,
+        linewidth=0,
+        antialiased=False,
+    )
     ax.scatter(xx_test, yy_test, model.predict(X_test).reshape(*xx_test.shape))
     plt.show()
