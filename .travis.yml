@@ -1,4 +1,5 @@
 language: python
+dist: xenial
 python:
    - "3.7"
 
@@ -6,7 +7,7 @@ before_install:
     - curl https://raw.githubusercontent.com/kennethreitz/pipenv/master/get-pipenv.py | python
 
 install:
-    - pipenv install
+    - pipenv install --dev
 
 script:
     - pipenv run python triangularregressor.py
