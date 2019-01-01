@@ -238,6 +238,8 @@ if __name__ == "__main__":
     print("Training score:", model.score(X_train, z_train))
     print("Testing score:", model.score(X_test, z_test))
 
+    assert model.score(X_test, z_test) > 0.99
+
     # 3D Visualization
     fig = plt.figure()
     ax = fig.gca(projection="3d")
